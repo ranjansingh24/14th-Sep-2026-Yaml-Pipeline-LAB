@@ -11,7 +11,7 @@ p-rgs = {
 p-vnet = {
   vnet1 = {
     name          = "vnet-dev"
-    location      = "eastus2"
+    location      = "East US 2"
     group         = "Ranjan_PG"
     address_space = ["10.0.0.0/16"]
   }

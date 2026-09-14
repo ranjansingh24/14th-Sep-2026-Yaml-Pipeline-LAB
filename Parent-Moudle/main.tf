@@ -37,7 +37,7 @@ module "nsg-creation" {
 }
 
 module "nic-creation" {
-  depends_on = [module.rg-creation, module.subnet-creation]
+  depends_on = [module.rg-creation, module.vnet-creation, module.subnet-creation]
   source     = "../Child-Module/azurerm_network_interface"
   c-nic      = var.p-nic
   subnetid   = module.subnet-creation.subnetid
