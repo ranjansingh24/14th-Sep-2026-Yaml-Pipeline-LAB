@@ -1,0 +1,95 @@
+name: $(Build.BuildId)
+
+trigger:
+- main
+
+pool:
+  name: 'Ranjan-PG-Agent'
+
+variables:
+  ARM_CLIENT_ID: 'e142cdc4-bc89-458b-ba2b-67e1b5764ad3'
+  ARM_TENANT_ID: '47c9c829-c470-4820-bb60-20888c5ae6de'
+  ARM_SUBSCRIPTION_ID: 'ea6c786f-3f34-4f15-a6f8-88057a9b27b9'
+  TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)/Parent-Moudle'
+
+stages:
+- stage: Stage_1_Validate_and_Plan
+  displayName: 'Stage 1: Terraform Validate and Plan'
+  jobs:
+  - job: Job_1_Plan
+    displayName: 'Job 1: Terraform Pre-deployment Checks & Plan'
+    steps:
+    - task: Bash@3
+      displayName: 'Task 1: Terraform Init'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform init
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+    - task: Bash@3
+      displayName: 'Task 2: Terraform Format'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform fmt -check || terraform fmt
+
+    - task: Bash@3
+      displayName: 'Task 3: Terraform Validate'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform validate
+
+    - task: Bash@3
+      displayName: 'Task 4: Terraform Plan'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform plan -out=tfplan
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+- stage: Stage_2_Apply
+  displayName: 'Stage 2: Terraform Apply'
+  dependsOn: Stage_1_Validate_and_Plan
+  jobs:
+  - job: Job_2_Apply
+    displayName: 'Job 2: Terraform Deployment Apply'
+    steps:
+    - task: Bash@3
+      displayName: 'Task 1: Terraform Init'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform init
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+    - task: Bash@3
+      displayName: 'Task 2: Terraform Apply'
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd $(TF_WORKING_DIR)
+          terraform apply -auto-approve
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
