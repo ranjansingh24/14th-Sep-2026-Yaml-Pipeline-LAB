@@ -1,1 +1,1 @@
-# variable "c-vm" {}
+variable "c-vm" {}

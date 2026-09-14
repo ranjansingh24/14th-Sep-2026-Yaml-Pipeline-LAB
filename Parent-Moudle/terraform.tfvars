@@ -110,7 +110,16 @@ p-nsg = {
   }
 }
 
-p-vm = {}
+p-vm = {
+  vm1 = {
+    name     = "vm-netflix-1"
+    location = "East US"
+    group    = "Ranjan_PG"
+    nic_key  = "nicnetfliex1"
+    size     = "Standard_B1s"
+  }
+}
+
 
 
 

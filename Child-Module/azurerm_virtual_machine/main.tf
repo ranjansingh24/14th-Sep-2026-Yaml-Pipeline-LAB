@@ -1,36 +1,27 @@
-# resource "azurerm_virtual_machine" "netflixvm1" {
-#   for_each              = var.c-vm
-#   name                  = each.value.name
-#   location              = each.value.location
-#   resource_group_name   = each.value.group
-#   network_interface_ids = each.value.network_interface_ids
-#   vm_size               = lookup(each.value, "size", "Standard_D2s_v3")
+resource "azurerm_linux_virtual_machine" "vm-chapra" {
+  for_each                        = var.c-vm
+  name                            = each.value.name
+  resource_group_name             = each.value.group
+  location                        = each.value.location
+  size                            = lookup(each.value, "size", "Standard_B1s")
+  admin_username                  = "adminranjan"
+  admin_password                  = "P@ssw0rd123456!"
+  disable_password_authentication = false
+  network_interface_ids           = each.value.network_interface_ids
 
-#   storage_image_reference {
-#     publisher = "Canonical"
-#     offer     = "0001-com-ubuntu-server-jammy"
-#     sku       = "22_04-lts"
-#     version   = "latest"
-#   }
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-#   storage_os_disk {
-#     name              = "osdisk-${each.value.name}"
-#     caching           = "ReadWrite"
-#     create_option     = "FromImage"
-#     managed_disk_type = "Standard_LRS"
-#   }
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
 
-#   os_profile {
-#     computer_name  = each.value.name
-#     admin_username = "adminranjan"
-#     admin_password = "admin@123456"
-#   }
-
-#   os_profile_linux_config {
-#     disable_password_authentication = false
-#   }
-
-#   tags = {
-#     environment = "staging"
-#   }
-# }
+  tags = {
+    environment = "staging"
+  }
+}

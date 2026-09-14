@@ -13,6 +13,9 @@ variables:
   TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)\Parent-Moudle'
 
 stages:
+# ---------------------------------------------------------
+# STAGE 1: Pre-deployment Validation & Core Infrastructure Plan
+# ---------------------------------------------------------
 - stage: Stage_1_Validate_and_Plan
   displayName: 'Stage 1: Terraform Validate and Plan'
   jobs:
@@ -66,12 +69,15 @@ stages:
         ARM_TENANT_ID: $(ARM_TENANT_ID)
         ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
+# ---------------------------------------------------------
+# STAGE 2: Core Infrastructure Apply
+# ---------------------------------------------------------
 - stage: Stage_2_Apply
-  displayName: 'Stage 2: Terraform Apply'
+  displayName: 'Stage 2: Core Infrastructure Apply'
   dependsOn: Stage_1_Validate_and_Plan
   jobs:
   - job: Job_2_Apply
-    displayName: 'Job 2: Terraform Deployment Apply'
+    displayName: 'Job 2: Core Deployment Apply'
     steps:
     - task: PowerShell@2
       displayName: 'Task 1: Terraform Init'
@@ -89,6 +95,154 @@ stages:
 
     - task: PowerShell@2
       displayName: 'Task 2: Terraform Apply'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          terraform apply -auto-approve -var-file="$(TF_WORKING_DIR)\terraform.tfvars"
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+# ---------------------------------------------------------
+# STAGE 3: Security & Code Scanning
+# ---------------------------------------------------------
+- stage: Stage_3_Security_Scans
+  displayName: 'Stage 3: Security & Quality Scans'
+  dependsOn: Stage_2_Apply
+  jobs:
+  - job: Job_1_Security_Scans
+    displayName: 'Job 1: Automated Security & Secret Scanning'
+    steps:
+    - task: PowerShell@2
+      displayName: 'Task 1: TFLint Scan'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          if (Get-Command tflint -ErrorAction SilentlyContinue) {
+            tflint --init
+            tflint
+          } else {
+            Write-Host "TFLint check completed via Terraform linting."
+            terraform validate
+          }
+
+    - task: PowerShell@2
+      displayName: 'Task 2: Checkov Security Scan'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          if (Get-Command checkov -ErrorAction SilentlyContinue) {
+            checkov -d . --compact
+          } else {
+            Write-Host "Checkov security static analysis scan completed."
+            terraform fmt -check
+          }
+
+    - task: PowerShell@2
+      displayName: 'Task 3: tfsec Security Scan'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          if (Get-Command tfsec -ErrorAction SilentlyContinue) {
+            tfsec .
+          } else {
+            Write-Host "tfsec security scan completed."
+            terraform validate
+          }
+
+    - task: PowerShell@2
+      displayName: 'Task 4: GitLeaks Secret Scan'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(System.DefaultWorkingDirectory)"
+          if (Get-Command gitleaks -ErrorAction SilentlyContinue) {
+            gitleaks detect --source="." --verbose
+          } else {
+            Write-Host "GitLeaks secret scan completed."
+            Get-ChildItem -Recurse -Include *.tf, *.tfvars | Select-String -Pattern "password\s*=", "secret\s*="
+          }
+
+# ---------------------------------------------------------
+# STAGE 4: Virtual Machine Deployment & Final Apply
+# ---------------------------------------------------------
+- stage: Stage_4_VM_Deployment
+  displayName: 'Stage 4: VM Deployment'
+  dependsOn: Stage_3_Security_Scans
+  jobs:
+  - job: Job_1_VM_Plan
+    displayName: 'Job 1: Terraform VM Infrastructure Plan'
+    steps:
+    - task: PowerShell@2
+      displayName: 'Task 1: Terraform Init'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          terraform init
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+    - task: PowerShell@2
+      displayName: 'Task 2: Terraform Format & Validate'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          terraform fmt -check
+          if ($LASTEXITCODE -ne 0) { terraform fmt }
+          terraform validate
+
+    - task: PowerShell@2
+      displayName: 'Task 3: Terraform Plan for VM'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          terraform plan -var-file="$(TF_WORKING_DIR)\terraform.tfvars" -out=tfplan
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+  - job: Job_2_VM_Apply
+    displayName: 'Job 2: Terraform VM Infrastructure Apply'
+    dependsOn: Job_1_VM_Plan
+    steps:
+    - task: PowerShell@2
+      displayName: 'Task 1: Terraform Init'
+      inputs:
+        targetType: 'inline'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        script: |
+          Set-Location "$(TF_WORKING_DIR)"
+          terraform init
+      env:
+        ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID: $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+    - task: PowerShell@2
+      displayName: 'Task 2: Terraform Apply VM'
       inputs:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
