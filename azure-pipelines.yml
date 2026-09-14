@@ -4,7 +4,7 @@ trigger:
 - main
 
 pool:
-  name: 'Ranjan_Pool'
+  name: 'Default'
   demands:
   - agent.name -equals Ranjan-PG-Agent
 
@@ -57,7 +57,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
-          terraform plan -out=tfplan
+          terraform plan -var-file="terraform.tfvars" -out=tfplan
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
@@ -90,7 +90,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var-file="terraform.tfvars"
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
