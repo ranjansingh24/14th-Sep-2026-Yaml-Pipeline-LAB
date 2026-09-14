@@ -25,6 +25,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform init
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
@@ -38,6 +39,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform fmt -check
           if ($LASTEXITCODE -ne 0) { terraform fmt }
 
@@ -47,6 +49,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform validate
 
     - task: PowerShell@2
@@ -55,6 +58,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform plan -var-file="terraform.tfvars" -out=tfplan
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
@@ -75,6 +79,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform init
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
@@ -88,6 +93,7 @@ stages:
         targetType: 'inline'
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
+          Set-Location "$(TF_WORKING_DIR)"
           terraform apply -auto-approve -var-file="terraform.tfvars"
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
