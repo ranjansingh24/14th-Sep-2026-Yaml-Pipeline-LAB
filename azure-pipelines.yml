@@ -4,13 +4,13 @@ trigger:
 - main
 
 pool:
-  name: 'Ranjan_Pool'
+  name: 'Default'
 
 variables:
   ARM_CLIENT_ID: 'e142cdc4-bc89-458b-ba2b-67e1b5764ad3'
   ARM_TENANT_ID: '47c9c829-c470-4820-bb60-20888c5ae6de'
   ARM_SUBSCRIPTION_ID: 'ea6c786f-3f34-4f15-a6f8-88057a9b27b9'
-  TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)/Parent-Moudle'
+  TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)\Parent-Moudle'
 
 stages:
 - stage: Stage_1_Validate_and_Plan
@@ -59,7 +59,7 @@ stages:
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
           Set-Location "$(TF_WORKING_DIR)"
-          terraform plan -var-file="$(TF_WORKING_DIR)/terraform.tfvars" -out=tfplan
+          terraform plan -out=tfplan
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
@@ -94,7 +94,7 @@ stages:
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
           Set-Location "$(TF_WORKING_DIR)"
-          terraform apply -auto-approve -var-file="$(TF_WORKING_DIR)/terraform.tfvars"
+          terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
