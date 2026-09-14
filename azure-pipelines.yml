@@ -4,7 +4,7 @@ trigger:
 - main
 
 pool:
-  name: 'Ranjan_Pool'
+  name: 'Default'
 
 variables:
   ARM_CLIENT_ID: 'e142cdc4-bc89-458b-ba2b-67e1b5764ad3'
@@ -59,7 +59,7 @@ stages:
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
           Set-Location "$(TF_WORKING_DIR)"
-          terraform plan -var-file="terraform.tfvars" -out=tfplan
+          terraform plan -out=tfplan
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
@@ -94,7 +94,7 @@ stages:
         workingDirectory: '$(TF_WORKING_DIR)'
         script: |
           Set-Location "$(TF_WORKING_DIR)"
-          terraform apply -auto-approve -var-file="terraform.tfvars"
+          terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
