@@ -5,8 +5,6 @@ trigger:
 
 pool:
   name: 'Default'
-  demands:
-  - agent.name -equals Ranjan-PG-Agent
 
 variables:
   ARM_CLIENT_ID: 'e142cdc4-bc89-458b-ba2b-67e1b5764ad3'
