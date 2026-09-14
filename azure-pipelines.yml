@@ -4,7 +4,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'
+  name: 'Ranjan_Pool'
   demands:
   - agent.name -equals Ranjan-PG-Agent
 
