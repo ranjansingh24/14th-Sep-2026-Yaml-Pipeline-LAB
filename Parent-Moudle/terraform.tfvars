@@ -1,17 +1,17 @@
 p-rgs = {
   rg1 = {
     name     = "Ranjan_PG"
-    location = "Central US"
+    location = "Denmark East"
   }
   rg2 = {
     name     = "rg-ranjan-prod-us"
-    location = "Central US"
+    location = "Denmark East"
   }
 }
 p-vnet = {
   vnet1 = {
     name          = "vnet-dev"
-    location      = "Central US"
+    location      = "Denmark East"
     group         = "Ranjan_PG"
     address_space = ["10.0.0.0/16"]
   }
@@ -39,7 +39,7 @@ p-sbn = {
 p-pip = {
   pip1 = {
     name     = "pipforbastion"
-    location = "Central US"
+    location = "Denmark East"
     group    = "Ranjan_PG"
     method   = "static"
   }
@@ -48,7 +48,7 @@ p-pip = {
 p-bas = {
   bastion = {
     name       = "bastionforchapra"
-    location   = "Central US"
+    location   = "Denmark East"
     group      = "Ranjan_PG"
     ipname     = "ip-config-for-bastion"
     subnetname = "subnet3"
@@ -59,7 +59,7 @@ p-bas = {
 p-nic = {
   nicnetfliex1 = {
     name      = "nic-netflix1"
-    location  = "Central US"
+    location  = "Denmark East"
     group     = "Ranjan_PG"
     ipcname   = "ip-config-netflix1"
     add-alloc = "Dynamic"
@@ -67,7 +67,7 @@ p-nic = {
   }
   nicnetfliex2 = {
     name      = "nic-netflix2"
-    location  = "Central US"
+    location  = "Denmark East"
     group     = "Ranjan_PG"
     ipcname   = "ip-config-netflix1"
     add-alloc = "Dynamic"
@@ -75,7 +75,7 @@ p-nic = {
   }
   nicstarbucks1 = {
     name      = "nic-starbucks1"
-    location  = "Central US"
+    location  = "Denmark East"
     group     = "Ranjan_PG"
     ipcname   = "ip-config-netflix1"
     add-alloc = "Dynamic"
@@ -83,7 +83,7 @@ p-nic = {
   }
   nicstarbucks2 = {
     name      = "nic-starbucks2"
-    location  = "Central US"
+    location  = "Denmark East"
     group     = "Ranjan_PG"
     ipcname   = "ip-config-netflix1"
     add-alloc = "Dynamic"
@@ -94,7 +94,7 @@ p-nic = {
 p-nsg = {
   vm-nsg1 = {
     name     = "ranjannsg-1"
-    location = "Central US"
+    location = "Denmark East"
     group    = "Ranjan_PG"
     inbound = {
       name                       = "Allow-SSH"
@@ -113,9 +113,9 @@ p-nsg = {
 p-vm = {
   vm1 = {
     name     = "vm-netflix-1"
-    location = "Central US"
+    location = "Denmark East"
     group    = "Ranjan_PG"
     nic_key  = "nicnetfliex1"
-    size     = "Standard_D2s_v3"
+    size     = "Standard_B1s"
   }
 }
