@@ -116,6 +116,6 @@ p-vm = {
     location = "Central US"
     group    = "Ranjan_PG"
     nic_key  = "nicnetfliex1"
-    size     = "Standard_B1s"
+    size     = "Standard_D2s_v3"
   }
 }
