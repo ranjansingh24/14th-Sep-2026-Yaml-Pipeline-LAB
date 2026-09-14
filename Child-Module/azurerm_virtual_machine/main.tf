@@ -3,7 +3,7 @@ resource "azurerm_linux_virtual_machine" "vm-chapra" {
   name                            = each.value.name
   resource_group_name             = each.value.group
   location                        = each.value.location
-  size                            = lookup(each.value, "size", "Standard_B1s")
+  size                            = lookup(each.value, "size", "Standard_B2s")
   admin_username                  = "adminranjan"
   admin_password                  = "P@ssw0rd123456!"
   disable_password_authentication = false
