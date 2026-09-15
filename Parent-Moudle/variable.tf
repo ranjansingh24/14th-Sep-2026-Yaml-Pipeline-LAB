@@ -1,8 +1,39 @@
-variable "p-rgs" { default = {} }
-variable "p-vnet" { default = {} }
-variable "p-sbn" { default = {} }
-variable "p-pip" { default = {} }
-variable "p-bas" { default = {} }
-variable "p-nsg" { default = {} }
-variable "p-nic" { default = {} }
-variable "p-vm" { default = {} }
+variable "p-rgs" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-vnet" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-sbn" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-pip" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-bas" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-nsg" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-nic" {
+  type    = map(any)
+  default = {}
+}
+
+variable "p-vm" {
+  type    = map(any)
+  default = {}
+}

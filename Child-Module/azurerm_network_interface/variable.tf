@@ -1,2 +1,7 @@
-variable "c-nic" {}
-variable "subnetid" {}
+variable "c-nic" {
+  type = any
+}
+
+variable "subnetid" {
+  type = any
+}

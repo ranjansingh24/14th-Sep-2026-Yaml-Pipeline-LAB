@@ -1,1 +1,3 @@
-variable "c-nsg" {}
+variable "c-nsg" {
+  type = any
+}

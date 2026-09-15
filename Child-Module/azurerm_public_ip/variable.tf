@@ -1,1 +1,3 @@
-variable "c-pip" {}
+variable "c-pip" {
+  type = any
+}

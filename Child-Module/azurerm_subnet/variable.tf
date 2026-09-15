@@ -1,1 +1,3 @@
-variable "c-sbn" {}
+variable "c-sbn" {
+  type = any
+}
